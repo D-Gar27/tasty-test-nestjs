@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String @id @default(uuid())
+  name       String
+  email      String @unique
+  password   String
+  is_banned  Boolean @default(false)
+  is_admin   Boolean @default(false)
+  created_at DateTime @default(now())
+  cart       Cart?
+  orders     Order[]
+}
+
+model Category {
+  id         String    @id @default(uuid())
+  name       String
+  food       Food[]
+  created_at DateTime @default(now())
+}
+
+model Food {
+  id             String       @id @default(uuid())
+  category_id    String
+  name           String
+  price          Float
+  description    String
+  image          String
+  created_at     DateTime @default(now())
+  discount_price Float      @default(0)
+  is_available   Boolean
+  toppings       Topping[]
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+  category       Category   @relation(fields: [category_id], references: [id])
+}
+
+model Topping {
+  id        String    @id @default(uuid())
+  food_id   String
+  is_radio  Boolean
+  label     String
+  items     ToppingItem[]
+  food      Food      @relation(fields: [food_id], references: [id])
+}
+
+model ToppingItem {
+  id         String            @id @default(uuid())
+  topping_id String
+  name       String
+  add_on_price Float
+  topping    Topping          @relation(fields: [topping_id], references: [id])
+  cartItemToppings CartItemTopping[]
+  orderItemToppings OrderItemTopping[]
+  created_at DateTime @default(now())
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  user_id   String     @unique
+  user      User       @relation(fields: [user_id], references: [id])
+  cartItems CartItem[]
+}
+
+model CartItem {
+  id        String       @id @default(uuid())
+  cart_id   String
+  food_id   String
+  quantity  Int
+  remark    String
+  cart      Cart        @relation(fields: [cart_id], references: [id])
+  food      Food        @relation(fields: [food_id], references: [id])
+  toppings  CartItemTopping[]
+  created_at DateTime   @default(now())
+}
+
+model CartItemTopping {
+  id            String       @id @default(uuid())
+  cart_item_id  String
+  topping_item_id String
+  cartItem      CartItem     @relation(fields: [cart_item_id], references: [id])
+  toppingItem   ToppingItem  @relation(fields: [topping_item_id], references: [id])
+  created_at DateTime @default(now())
+}
+
+model Order {
+  id          String     @id @default(uuid())
+  user_id     String
+  total_price Float
+  status      String
+  created_at  DateTime   @default(now())
+  user        User       @relation(fields: [user_id], references: [id])
+  orderItems  OrderItem[]
+}
+
+model OrderItem {
+  id         String       @id @default(uuid())
+  order_id   String
+  food_id    String
+  quantity   Int
+  price      Float
+  remark     String
+  order      Order        @relation(fields: [order_id], references: [id])
+  food       Food         @relation(fields: [food_id], references: [id])
+  toppings   OrderItemTopping[]
+  created_at DateTime     @default(now())
+}
+
+model OrderItemTopping {
+  id             String        @id @default(uuid())
+  order_item_id  String
+  topping_item_id String
+  orderItem      OrderItem     @relation(fields: [order_item_id], references: [id])
+  toppingItem    ToppingItem   @relation(fields: [topping_item_id], references: [id])
+  created_at DateTime @default(now())
+}
