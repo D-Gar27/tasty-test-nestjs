@@ -49,6 +49,7 @@ model Topping {
   label     String
   items     ToppingItem[]
   food      Food      @relation(fields: [food_id], references: [id])
+  created_at DateTime @default(now())
 }
 
 model ToppingItem {

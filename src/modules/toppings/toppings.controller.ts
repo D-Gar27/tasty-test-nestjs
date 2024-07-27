@@ -17,12 +17,6 @@ import {
   UpdateToppingSchema,
 } from './toppings.dto';
 import { ZodValidationPipe } from 'nestjs-zod';
-import {
-  CreateToppingItemDto,
-  CreateToppingItemSchema,
-  UpdateToppingItemDto,
-  UpdateToppingItemSchema,
-} from './toppingItem/toppingItem.dto';
 
 @Controller('toppings')
 export class ToppingsController {
@@ -65,38 +59,6 @@ export class ToppingsController {
   async delete(@Param('id') id: string) {
     return returnResponse(
       await this.toppingService.delete(id),
-      'Successfully deleted',
-      HttpStatus.OK,
-    );
-  }
-
-  @Post('items')
-  async createItem(
-    @Body(new ZodValidationPipe(CreateToppingItemSchema))
-    createItemDto: CreateToppingItemDto,
-  ) {
-    return returnResponse(
-      await this.toppingService.createItem(createItemDto),
-      'New topping item added',
-      HttpStatus.CREATED,
-    );
-  }
-  @Put('items/:id')
-  async updateItem(
-    @Body(new ZodValidationPipe(UpdateToppingItemSchema))
-    updateItem: UpdateToppingItemDto,
-    @Param('id') id: string,
-  ) {
-    return returnResponse(
-      await this.toppingService.updateItem(updateItem, id),
-      'Successfully edited',
-      HttpStatus.OK,
-    );
-  }
-  @Delete('items/:id')
-  async deleteItem(@Param('id') id: string) {
-    return returnResponse(
-      await this.toppingService.deleteItem(id),
       'Successfully deleted',
       HttpStatus.OK,
     );

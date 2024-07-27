@@ -22,12 +22,30 @@ export class FoodsService {
       select: {
         id: true,
         name: true,
-        category_id: true,
         price: true,
         description: true,
         image: true,
+        created_at: true,
         discount_price: true,
-        toppings: true,
+        is_available: true,
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        toppings: {
+          select: {
+            id: true,
+            label: true,
+            is_radio: true,
+            items: true,
+          },
+        },
+      },
+      where: { is_available: true },
+      orderBy: {
+        created_at: 'desc',
       },
     });
     return foods;

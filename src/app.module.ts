@@ -13,6 +13,7 @@ import { CartModule } from './modules/cart/cart.module';
 import { ConfigModule } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ToppingItemsModule } from './modules/toppings/toppingItem/toppingItem.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { join } from 'path';
     FoodsModule,
     OrdersModule,
     ToppingsModule,
+    ToppingItemsModule,
     CartModule,
     ConfigModule.forRoot({ isGlobal: true }),
     ServeStaticModule.forRoot({

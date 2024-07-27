@@ -1,10 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateToppingDto, UpdateToppingDto } from './toppings.dto';
-import {
-  CreateToppingItemDto,
-  UpdateToppingItemDto,
-} from './toppingItem/toppingItem.dto';
 
 @Injectable()
 export class ToppingsService {
@@ -13,7 +9,14 @@ export class ToppingsService {
     const toppings = await this.prisma.topping.findMany({
       where: { food_id: data },
       include: {
-        items: true,
+        items: {
+          orderBy: {
+            created_at: 'asc',
+          },
+        },
+      },
+      orderBy: {
+        created_at: 'desc',
       },
     });
     return toppings;
@@ -33,31 +36,12 @@ export class ToppingsService {
     });
     return topping;
   }
-  async delete(data: string) {
+  async delete(id: string) {
+    await this.prisma.toppingItem.deleteMany({
+      where: { topping_id: id },
+    });
     await this.prisma.topping.delete({
-      where: { id: data },
-    });
-    return 'success';
-  }
-
-  async createItem(data: CreateToppingItemDto) {
-    const isToppingExist = await this.prisma.topping.findUnique({
-      where: { id: data.topping_id },
-    });
-    if (!isToppingExist) throw new NotFoundException('Topping is not found');
-    const toppingItem = await this.prisma.toppingItem.create({ data });
-    return toppingItem;
-  }
-  async updateItem(data: UpdateToppingItemDto, id: string) {
-    const toppingItem = await this.prisma.toppingItem.update({
       where: { id },
-      data,
-    });
-    return toppingItem;
-  }
-  async deleteItem(data: string) {
-    await this.prisma.toppingItem.delete({
-      where: { id: data },
     });
     return 'success';
   }
