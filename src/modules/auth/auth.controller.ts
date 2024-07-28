@@ -1,4 +1,11 @@
-import { Controller, Post, Body, UsePipes, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UsePipes,
+  HttpStatus,
+  Param,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ZodValidationPipe } from 'nestjs-zod';
 import {
@@ -28,6 +35,15 @@ export class AuthController {
     return returnResponse(
       await this.authService.login(data, true),
       'Login Success',
+      HttpStatus.OK,
+    );
+  }
+
+  @Post('make-admin/:id')
+  async makeAdmin(@Param('id') id: string) {
+    return returnResponse(
+      await this.authService.makeAdmin(id),
+      'He is admin now',
       HttpStatus.OK,
     );
   }
