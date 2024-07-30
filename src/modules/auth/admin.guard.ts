@@ -7,7 +7,7 @@ import {
 import { JwtAuthGuard } from './jwt.guard';
 
 @Injectable()
-export class UserAuthGuard extends JwtAuthGuard implements CanActivate {
+export class AdminAuthGuard extends JwtAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     await super.canActivate(context);
 

@@ -6,6 +6,60 @@ import { CreateCartDto, UpdateCartDto } from './cart.dto';
 export class CartService {
   constructor(private readonly prisma: PrismaService) {}
 
+  async getCart(id: string) {
+    const result = await this.prisma.cart.findUnique({
+      where: { user_id: id },
+      select: {
+        id: true,
+        cartItems: {
+          select: {
+            id: true,
+            quantity: true,
+            remark: true,
+            created_at: true,
+            food: {
+              select: {
+                id: true,
+                name: true,
+                price: true,
+                image: true,
+                discount_price: true,
+              },
+            },
+            toppings: {
+              select: {
+                toppingItem: {
+                  select: {
+                    id: true,
+                    topping_id: true,
+                    name: true,
+                    add_on_price: true,
+                    created_at: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Transform the data to the desired structure
+    if (result) {
+      const transformedResult = {
+        ...result,
+        cartItems: result.cartItems.map((item) => ({
+          ...item,
+          toppings: item.toppings.map((topping) => ({
+            ...topping.toppingItem,
+          })),
+        })),
+      };
+      return transformedResult;
+    }
+    return [];
+  }
+
   async addFoodToCart(createCartDto: CreateCartDto) {
     const {
       userId,
@@ -15,12 +69,7 @@ export class CartService {
       toppingItemIds = [],
     } = createCartDto;
 
-    const cart = await this.prisma.cart.findUnique({
-      where: { user_id: userId },
-    });
-    if (!cart) {
-      throw new Error('Cart not found');
-    }
+    const cart = await this.prisma.cart.create({ data: { user_id: userId } });
 
     const cartItem = await this.prisma.cartItem.create({
       data: {

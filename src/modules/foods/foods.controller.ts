@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -28,13 +29,11 @@ export class FoodsController {
   constructor(private foodService: FoodsService) {}
 
   @Get()
-  async findAllForUser() {
-    return returnResponse(
-      await this.foodService.findAllForUser(),
-      'Retrieved foods',
-      HttpStatus.OK,
-    );
+  async findAllForUser(@Query('category') category: string) {
+    const foods = await this.foodService.findAllForUser(category);
+    return returnResponse(foods, 'Retrieved foods', HttpStatus.OK);
   }
+
   @Get('admin')
   async findAllForAdmin() {
     return returnResponse(

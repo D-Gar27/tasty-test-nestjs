@@ -17,7 +17,8 @@ export class FoodsService {
     return food;
   }
 
-  async findAllForUser() {
+  async findAllForUser(category?: string) {
+    const whereClause = category ? { category_id: category } : {};
     const foods = await this.prisma.food.findMany({
       select: {
         id: true,
@@ -43,7 +44,7 @@ export class FoodsService {
           },
         },
       },
-      where: { is_available: true },
+      where: { is_available: true, ...whereClause },
       orderBy: {
         created_at: 'desc',
       },
