@@ -17,6 +17,7 @@ model User {
   created_at DateTime @default(now())
   cart       Cart?
   orders     Order[]
+  feedbacks     Feedback[]
 }
 
 model Category {
@@ -99,6 +100,7 @@ model Order {
   created_at  DateTime   @default(now())
   user        User       @relation(fields: [user_id], references: [id])
   orderItems  OrderItem[]
+  feedbacks     Feedback[]
 }
 
 model OrderItem {
@@ -121,4 +123,15 @@ model OrderItemTopping {
   orderItem      OrderItem     @relation(fields: [order_item_id], references: [id])
   toppingItem    ToppingItem   @relation(fields: [topping_item_id], references: [id])
   created_at DateTime @default(now())
+}
+
+model Feedback {
+  id         String   @id @default(uuid())
+  order_id   String
+  user_id    String
+  rating     Int      // rating can be a value between 1 to 5
+  comment    String?
+  created_at DateTime @default(now())
+  order      Order    @relation(fields: [order_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id])
 }
