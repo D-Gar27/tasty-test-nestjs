@@ -11,13 +11,7 @@ import { UserAuthGuard } from './user.guard';
 import { AdminAuthGuard } from './admin.guard';
 
 @Module({
-  imports: [
-    PassportModule,
-    JwtModule.register({
-      secret: 't@styJWT',
-      signOptions: { expiresIn: '60m' },
-    }),
-  ],
+  imports: [PassportModule],
   controllers: [AuthController],
   providers: [
     AuthService,

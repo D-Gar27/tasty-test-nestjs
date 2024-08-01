@@ -14,6 +14,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ToppingItemsModule } from './modules/toppings/toppingItem/toppingItem.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -27,6 +28,11 @@ import { OrdersModule } from './modules/orders/orders.module';
     ToppingItemsModule,
     CartModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    JwtModule.register({
+      global: true,
+      secret: 't@styJWT',
+      signOptions: { expiresIn: '9999h' },
+    }),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads', // Route for accessing the files

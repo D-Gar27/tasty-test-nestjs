@@ -6,6 +6,7 @@ export const CreateCartDto = z.object({
   quantity: z.number().positive(),
   remark: z.string().optional(),
   toppingItemIds: z.array(z.string().uuid()).optional(),
+  isTakeOut: z.boolean().optional().default(false),
 });
 
 export const UpdateCartDto = z.object({

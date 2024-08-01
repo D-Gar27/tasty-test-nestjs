@@ -17,18 +17,18 @@ export class CartController {
   constructor(private readonly cartService: CartService) {}
 
   @Get(':userId')
-  // @UseGuards(UserAuthGuard)
+  @UseGuards(UserAuthGuard)
   async getCart(@Param('userId') userId: string) {
     return this.cartService.getCart(userId);
   }
   @Post()
-  // @UseGuards(UserAuthGuard)
+  @UseGuards(UserAuthGuard)
   async addFoodToCart(@Body() createCartDto: CreateCartDto) {
     return this.cartService.addFoodToCart(createCartDto);
   }
 
   @Patch(':id')
-  // @UseGuards(UserAuthGuard)
+  @UseGuards(UserAuthGuard)
   async updateCartItem(
     @Param('id') id: string,
     @Body() updateCartDto: UpdateCartDto,
@@ -37,7 +37,7 @@ export class CartController {
   }
 
   @Delete(':id')
-  // @UseGuards(UserAuthGuard)
+  @UseGuards(UserAuthGuard)
   async removeCartItem(@Param('id') id: string) {
     return this.cartService.removeCartItem(id);
   }

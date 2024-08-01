@@ -7,7 +7,7 @@ export class OrdersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async checkout(checkoutDto: CheckoutDto) {
-    const { user_id, total_price } = checkoutDto;
+    const { user_id, total_price, ...rest } = checkoutDto;
 
     // Retrieve the user's cart
     const cart = await this.prisma.cart.findUnique({
@@ -32,6 +32,7 @@ export class OrdersService {
         user_id: user_id,
         total_price: total_price,
         status: 'success',
+        ...rest,
         orderItems: {
           create: cart.cartItems.map((item) => ({
             food_id: item.food_id,
@@ -67,13 +68,17 @@ export class OrdersService {
   }
 
   async getOrder(id: string) {
-    return this.prisma.order.findUnique({
+    const order = await this.prisma.order.findUnique({
       where: { id },
       select: {
         id: true,
         total_price: true,
         status: true,
         created_at: true,
+        name: true,
+        phone: true,
+        address: true,
+        type: true,
         user: {
           select: {
             id: true,
@@ -82,17 +87,86 @@ export class OrdersService {
           },
         },
         orderItems: {
-          include: {
-            food: true,
+          select: {
+            id: true,
+            order_id: true,
+            food_id: true,
+            quantity: true,
+            price: true,
+            remark: true,
+            created_at: true,
+            food: {
+              select: {
+                id: true,
+                name: true,
+                price: true,
+                image: true,
+                discount_price: true,
+              },
+            },
             toppings: {
-              include: {
-                toppingItem: true,
+              select: {
+                toppingItem: {
+                  select: {
+                    id: true,
+                    name: true,
+                    add_on_price: true,
+                    topping: {
+                      select: {
+                        label: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           },
         },
       },
     });
+
+    if (!order) {
+      return null;
+    }
+
+    const transformedOrderItems = order.orderItems.map((item) => ({
+      id: item.id,
+      order_id: item.order_id,
+      food_id: item.food_id,
+      quantity: item.quantity,
+      price: item.price,
+      remark: item.remark,
+      created_at: item.created_at.toISOString(),
+      food: {
+        id: item.food.id,
+        name: item.food.name,
+        price: item.food.price,
+        image: item.food.image,
+        discount_price: item.food.discount_price,
+      },
+      toppings: item.toppings.map((topping) => ({
+        id: topping.toppingItem.id,
+        name: topping.toppingItem.name,
+        add_on_price: topping.toppingItem.add_on_price,
+      })),
+    }));
+
+    return {
+      id: order.id,
+      total_price: order.total_price,
+      status: order.status,
+      name: order.name,
+      phone: order.phone,
+      address: order.address,
+      type: order.type,
+      created_at: order.created_at.toISOString(),
+      user: {
+        id: order.user.id,
+        name: order.user.name,
+        email: order.user.email,
+      },
+      orderItems: transformedOrderItems,
+    };
   }
 
   async getUserOrders(userId: string) {
@@ -103,6 +177,7 @@ export class OrdersService {
         total_price: true,
         status: true,
         created_at: true,
+        type: true,
       },
     });
   }
@@ -117,11 +192,19 @@ export class OrdersService {
         total_price: true,
         status: true,
         created_at: true,
+        type: true,
+        name: true,
+        phone: true,
         user: {
           select: {
             id: true,
             name: true,
             email: true,
+          },
+        },
+        _count: {
+          select: {
+            orderItems: true,
           },
         },
       },
@@ -131,10 +214,12 @@ export class OrdersService {
 
     return {
       data: orders,
-      page,
-      limit,
-      totalPages: Math.ceil(totalOrders / limit),
-      totalOrders,
+      meta: {
+        page,
+        limit,
+        totalPages: Math.ceil(totalOrders / limit),
+        totalOrders,
+      },
     };
   }
 }

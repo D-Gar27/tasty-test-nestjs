@@ -66,16 +66,21 @@ export class CartService {
       foodId,
       quantity,
       remark,
+      isTakeOut,
       toppingItemIds = [],
     } = createCartDto;
-
-    const cart = await this.prisma.cart.create({ data: { user_id: userId } });
+    let cart = await this.prisma.cart.findUnique({
+      where: { user_id: userId },
+    });
+    if (!cart)
+      cart = await this.prisma.cart.create({ data: { user_id: userId } });
 
     const cartItem = await this.prisma.cartItem.create({
       data: {
         cart_id: cart.id,
         food_id: foodId,
         quantity,
+        is_take_out: isTakeOut,
         remark: remark || '',
         toppings: {
           create: toppingItemIds.map((toppingItemId) => ({

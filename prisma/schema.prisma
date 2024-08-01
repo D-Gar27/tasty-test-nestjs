@@ -72,15 +72,16 @@ model Cart {
 }
 
 model CartItem {
-  id        String       @id @default(uuid())
-  cart_id   String
-  food_id   String
-  quantity  Int
-  remark    String
-  cart      Cart        @relation(fields: [cart_id], references: [id])
-  food      Food        @relation(fields: [food_id], references: [id])
-  toppings  CartItemTopping[]
-  created_at DateTime   @default(now())
+  id          String            @id @default(uuid())
+  cart_id     String
+  food_id     String
+  quantity    Int
+  remark      String
+  is_take_out Boolean @default(false)
+  cart        Cart             @relation(fields: [cart_id], references: [id])
+  food        Food             @relation(fields: [food_id], references: [id])
+  toppings    CartItemTopping[]
+  created_at  DateTime         @default(now())
 }
 
 model CartItemTopping {
@@ -97,6 +98,10 @@ model Order {
   user_id     String
   total_price Float
   status      String
+  name String
+  phone String
+  address String
+  type String
   created_at  DateTime   @default(now())
   user        User       @relation(fields: [user_id], references: [id])
   orderItems  OrderItem[]
@@ -129,7 +134,7 @@ model Feedback {
   id         String   @id @default(uuid())
   order_id   String
   user_id    String
-  rating     Int      // rating can be a value between 1 to 5
+  rating     Int      
   comment    String?
   created_at DateTime @default(now())
   order      Order    @relation(fields: [order_id], references: [id])
