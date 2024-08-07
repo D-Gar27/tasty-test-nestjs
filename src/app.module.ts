@@ -15,6 +15,7 @@ import { join } from 'path';
 import { ToppingItemsModule } from './modules/toppings/toppingItem/toppingItem.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { JwtModule } from '@nestjs/jwt';
+import { FeedbackModule } from './modules/feedback/feedback.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { JwtModule } from '@nestjs/jwt';
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads', // Route for accessing the files
     }),
+    FeedbackModule,
   ],
   controllers: [AppController],
   providers: [AppService],
